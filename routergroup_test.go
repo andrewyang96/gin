@@ -20,16 +20,16 @@ func TestRouterGroupBasic(t *testing.T) {
 	group := router.Group("/hola", func(c *Context) {})
 	group.Use(func(c *Context) {})
 
-	assert.Len(t, group.Handlers, 2)
+	assert.Len(t, group.GetHandlers(), 2)
 	assert.Equal(t, "/hola", group.BasePath())
-	assert.Equal(t, router, group.engine)
+	assert.Equal(t, router, group.GetEngine())
 
 	group2 := group.Group("manu")
 	group2.Use(func(c *Context) {}, func(c *Context) {})
 
-	assert.Len(t, group2.Handlers, 4)
+	assert.Len(t, group2.GetHandlers(), 4)
 	assert.Equal(t, "/hola/manu", group2.BasePath())
-	assert.Equal(t, router, group2.engine)
+	assert.Equal(t, router, group2.GetEngine())
 }
 
 func TestRouterGroupBasicHandle(t *testing.T) {

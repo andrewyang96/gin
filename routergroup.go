@@ -14,7 +14,11 @@ import (
 // IRouter defines all router handle interface includes single and group router.
 type IRouter interface {
 	IRoutes
-	Group(string, ...HandlerFunc) *RouterGroup
+	Group(string, ...HandlerFunc) IRouter
+
+	BasePath() string
+	GetEngine() *Engine
+	GetHandlers() HandlersChain
 }
 
 // IRoutes defines all router handle interface.
@@ -55,7 +59,7 @@ func (group *RouterGroup) Use(middleware ...HandlerFunc) IRoutes {
 
 // Group creates a new router group. You should add all the routes that have common middlewares or the same path prefix.
 // For example, all the routes that use a common middleware for authorization could be grouped.
-func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *RouterGroup {
+func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) IRouter {
 	return &RouterGroup{
 		Handlers: group.combineHandlers(handlers),
 		basePath: group.calculateAbsolutePath(relativePath),
@@ -67,6 +71,14 @@ func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *R
 // For example, if v := router.Group("/rest/n/v1/api"), v.BasePath() is "/rest/n/v1/api".
 func (group *RouterGroup) BasePath() string {
 	return group.basePath
+}
+
+func (group *RouterGroup) GetEngine() *Engine {
+	return group.engine
+}
+
+func (group *RouterGroup) GetHandlers() HandlersChain {
+	return group.Handlers
 }
 
 func (group *RouterGroup) handle(httpMethod, relativePath string, handlers HandlersChain) IRoutes {
